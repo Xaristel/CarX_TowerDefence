@@ -4,13 +4,20 @@ using System;
 
 public class CannonProjectile : MonoBehaviour
 {
-    public float m_speed = 0.3f;
+    public float m_speed = 0.2f;
     public int m_damage = 10;
+    public Rigidbody m_rigidbody;
 
-    void Update()
+    private void Start()
     {
-        var translation = Vector3.forward * m_speed;
-        transform.Translate(translation);
+        m_rigidbody = GetComponent<Rigidbody>();
+        m_rigidbody.velocity = transform.forward * m_speed;
+    }
+
+    private void Update()
+    {
+        if (transform.position.magnitude > 30)
+            Destroy(gameObject);
     }
 
     void OnTriggerEnter(Collider other)
