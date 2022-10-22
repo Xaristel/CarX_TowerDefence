@@ -1,38 +1,21 @@
 ﻿using UnityEngine;
-using System.Collections;
-using static UnityEngine.GraphicsBuffer;
 
-public class CannonTower : MonoBehaviour
+public class CannonTower : TowerBase
 {
-    public float m_shootInterval = 0.5f;
-    public float m_range = 2f;
-    public GameObject m_projectilePrefab;
-    public Transform m_shootPoint;
-    private float m_lastShotTime = -0.5f;
-    private Enemy m_currentTarget;
-
     [SerializeField]
-    private float m_speed = 5f;
+    private float m_rotationSpeed = 5f;
 
     void Update()
     {
-        if (m_projectilePrefab == null || m_shootPoint == null)
-            return;
-
-        if (m_currentTarget == null)
+        if (CanShoot())
         {
-            m_currentTarget = FindTarget();
+            RotateCannon();
+            Shoot();
         }
+    }
 
-        if (m_currentTarget == null)
-            return;
-
-        if (Vector3.Distance(transform.position, m_currentTarget.transform.position) > m_range)
-        {
-            m_currentTarget = null;
-            return;
-        }
-
+    private void RotateCannon()
+    {
         var enemyVelocity = m_currentTarget.GetComponent<Enemy>().m_rigidbody.velocity;
         var projSpeed = m_projectilePrefab.GetComponent<CannonProjectile>().m_speed;
         Quaternion rotation = transform.rotation;
@@ -42,25 +25,16 @@ public class CannonTower : MonoBehaviour
             rotation = Quaternion.LookRotation(predictiveDirection);
         }
 
-        transform.rotation = Quaternion.Lerp(transform.rotation, rotation, Time.deltaTime * m_speed);
+        transform.rotation = Quaternion.Lerp(transform.rotation, rotation, Time.deltaTime * m_rotationSpeed);
+    }
 
-        //shot
+    public override void Shoot()
+    {
         if (m_lastShotTime + m_shootInterval > Time.time)
             return;
 
         Instantiate(m_projectilePrefab, m_shootPoint.position, m_shootPoint.rotation);
         m_lastShotTime = Time.time;
-    }
-
-    private Enemy FindTarget()
-    {
-        foreach (var enemy in FindObjectsOfType<Enemy>())
-        {
-            if (Vector3.Distance(transform.position, enemy.transform.position) < m_range)
-                return enemy;
-        }
-
-        return null;
     }
 
     private bool InterceptionDirection(Vector3 enemyPos, Vector3 projPos, Vector3 enemyVelocity, float projSpeed, out Vector3 predictiveDirection)

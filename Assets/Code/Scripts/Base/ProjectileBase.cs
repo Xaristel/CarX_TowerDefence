@@ -1,24 +1,11 @@
-﻿using UnityEngine;
 using System.Collections;
-using System;
+using System.Collections.Generic;
+using UnityEngine;
 
-public class CannonProjectile : MonoBehaviour
+public class ProjectileBase : MonoBehaviour
 {
     public float m_speed = 0.2f;
     public int m_damage = 10;
-    public Rigidbody m_rigidbody;
-
-    private void Start()
-    {
-        m_rigidbody = GetComponent<Rigidbody>();
-        m_rigidbody.velocity = transform.forward * m_speed;
-    }
-
-    private void Update()
-    {
-        if (transform.position.magnitude > 30)
-            Destroy(gameObject);
-    }
 
     void OnTriggerEnter(Collider other)
     {
